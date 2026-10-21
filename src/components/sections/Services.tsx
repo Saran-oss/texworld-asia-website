@@ -202,7 +202,7 @@ export default function Services() {
           position: relative;
           isolation: isolate;
           overflow: hidden;
-          padding: 68px 0 42px;
+          padding: 68px 0 68px;
           background: #101411;
           color: #fff;
         }
