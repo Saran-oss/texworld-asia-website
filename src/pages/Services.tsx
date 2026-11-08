@@ -1,158 +1,195 @@
-﻿import { buildImageUrl } from '../lib/images'
-import { services, inspectionStages, processSteps } from '../data/content'
+﻿import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 
-export default function Services() {
-  const heroImg = buildImageUrl(
-    'Wide editorial banner: quality inspector examining a folded cotton fabric on a wooden inspection table, warm daylight, measuring tape and fabric swatches on the side, shallow depth of field, warm ivory and deep green palette, 16:7 crop',
-    'landscape_16_9'
-  )
+type Service = {
+  title: string
+  text: string
+  span: string
+  variant: 'light' | 'dark'
+  size?: 'lg'
+}
 
-  const sImages = services.map((s, i) =>
-    buildImageUrl(
-      [
-        'A fabric sourcing manager reviewing cotton fabric swatches on a linen desk, warm daylight, various woven fabric samples, editorial composition',
-        'Textile product development sketches with fabric swatches and yarn cones on a wooden table, natural daylight',
-        'Purchase orders and shipping documents laid flat next to a woven cotton sample, soft daylight, editorial flat lay',
-        'Factory compliance audit paperwork with a clipboard and pen on a linen surface, soft natural light',
-        'Textile quality inspector examining a fabric roll with measuring tools, warm daylight, inspection table',
-        'Brand development mood board with textile color swatches and home textile product sketches, warm natural light',
-      ][i],
-      'portrait_4_3'
+const services: Service[] = [
+  {
+    title: 'Textile Sourcing',
+    text: 'Sourcing takes deep knowledge of the industry. We identify the right suppliers, negotiate price and terms, and manage procurement start to finish, so your business grows on solid ground.',
+    span: 'lg:col-span-7',
+    variant: 'light',
+    size: 'lg',
+  },
+  {
+    title: 'Third-Party Inspection',
+    text: 'We examine fabrics and finished goods at every stage of production, raw material, pre-production, in-process, and final, to catch defects before they reach you.',
+    span: 'lg:col-span-5',
+    variant: 'light',
+  },
+  {
+    title: 'Brand Development',
+    text: 'Over a decade building brands across home textiles, towels, socks, and institutional apparel, from first sketch through execution and compliance.',
+    span: 'lg:col-span-4',
+    variant: 'light',
+  },
+  {
+    title: 'Product Development',
+    text: 'We turn concepts into market-ready samples and bulk production, managing raw material selection through final specs so your vision arrives intact.',
+    span: 'lg:col-span-4',
+    variant: 'light',
+  },
+  {
+    title: 'Order Execution',
+    text: 'From purchase order to final shipment, we handle documentation, production follow-up, quality checks, and logistics, so every order lands on time.',
+    span: 'lg:col-span-4',
+    variant: 'light',
+  },
+  {
+    title: 'Factory Compliance',
+    text: 'We audit factories against international social, ethical, and quality standards, so you know exactly who you are working with before the first order.',
+    span: 'lg:col-span-12',
+    variant: 'dark',
+  },
+]
+
+function handleCardMove(e: MouseEvent<HTMLDivElement>) {
+  const el = e.currentTarget
+  const rect = el.getBoundingClientRect()
+  const x = ((e.clientX - rect.left) / rect.width) * 100
+  const y = ((e.clientY - rect.top) / rect.height) * 100
+  el.style.setProperty('--mx', `${x}%`)
+  el.style.setProperty('--my', `${y}%`)
+}
+
+export default function Services() {
+  const gridRef = useRef<HTMLDivElement | null>(null)
+  const [gridVisible, setGridVisible] = useState(false)
+
+  useEffect(() => {
+    const node = gridRef.current
+    if (!node) return
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReduced) {
+      setGridVisible(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setGridVisible(true)
+            observer.disconnect()
+          }
+        })
+      },
+      { threshold: 0.12 }
     )
-  )
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <>
-      <section className="w-full pt-[64px] lg:pt-[88px]">
-        <div
-          className="w-full relative"
-          style={{
-            aspectRatio: '16 / 7',
-            backgroundImage: `linear-gradient(to right, rgba(19,27,22,0.55), rgba(19,27,22,0.35) 45%, transparent 75%), url(${heroImg})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <div className="container-wide h-full flex items-end pb-16 lg:pb-20 pt-20">
-            <div className="max-w-3xl">
-              <p className="eyebrow !text-white/90 mb-4">Our Services</p>
-              <h1 className="text-white" style={{ maxWidth: '22ch' }}>
-                Weave Confidence. Deliver Quality.
+      <section className="w-full pt-[88px] lg:pt-[120px] pb-16 lg:pb-24" style={{ backgroundColor: '#FFFFFF' }}>
+        <div className="container-wide">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-10 lg:gap-x-12 items-end mb-12 lg:mb-16">
+            <div className="lg:col-span-7">
+              <h1 className="leading-none" style={{ fontFamily: '"Fraunces", Georgia, "Times New Roman", serif', fontWeight: 500, letterSpacing: '-2px', lineHeight: 0.94, fontSize: 'clamp(38px, 6.5vw, 96px)' }}>
+                <span className="hero-word" style={{ color: '#302B2B', display: 'block', animationDelay: '0ms' }}>OUR</span>
+                <span className="hero-word" style={{ color: '#568E49', display: 'block', animationDelay: '120ms' }}>SERVICES</span>
               </h1>
-              <p className="mt-6 max-w-2xl" style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'var(--text-body-lg)', lineHeight: 1.6 }}>
-                Transform your textile journey with end-to-end sourcing and quality-control services. Partner with us for a fabric of trust and excellence.
+            </div>
+
+            <div className="lg:col-span-5 lg:pb-2 hero-word" style={{ animationDelay: '240ms' }}>
+              <h2 style={{ fontFamily: '"Fraunces", Georgia, serif', fontWeight: 500, color: '#1B4332', fontSize: '1.2rem', marginBottom: '12px' }}>
+                Comprehensive Textile Solutions
+              </h2>
+              <p className="font-body text-text-secondary" style={{ fontSize: '0.9375rem', lineHeight: 1.65, maxWidth: '36ch' }}>
+                From sourcing to supply, we offer end-to-end textile services
+                to meet your business needs with quality, reliability, and
+                care.
               </p>
+
+              <Link to="/contact" className="services-btn">
+                Contact Us
+                <ArrowRight size={14} strokeWidth={2} />
+              </Link>
+            </div>
+          </div>
+
+          <div className="hero-word" style={{ animationDelay: '360ms' }}>
+            <div style={{ maxHeight: '500px', borderRadius: '20px', overflow: 'hidden' }}>
+              <img
+                src="/mission.jpg"
+                alt="Texworld Asia mission"
+                className="w-full"
+                style={{ height: '100%', maxHeight: '500px', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+              />
             </div>
           </div>
         </div>
       </section>
 
-      <section id="all-services" className="section">
+      <section className="w-full py-20 lg:py-28" style={{ backgroundColor: '#FAFAF8' }}>
         <div className="container-wide">
-          <div className="section-heading">
-            <p className="eyebrow">Service Overview</p>
-            <h2 className="section-heading__title" style={{ maxWidth: '22ch' }}>
-              Six Services, One Trusted Partner.
-            </h2>
-          </div>
-
-          <div className="border-t border-border">
-            {services.map((s, i) => (
-              <div
-                key={s.id}
-                id={s.slug}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-y-8 lg:gap-y-0 lg:gap-x-10 py-10 lg:py-14 border-b border-border"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-6 lg:gap-x-12 mb-14 lg:mb-16">
+            <div className="lg:col-span-7">
+              <h2
+                style={{
+                  fontFamily: '"Fraunces", Georgia, serif',
+                  fontWeight: 500,
+                  color: '#302B2B',
+                  letterSpacing: '-0.5px',
+                  lineHeight: 1.08,
+                  fontSize: 'clamp(28px, 3.4vw, 44px)',
+                }}
               >
-                <div className="lg:col-span-1 flex items-start">
-                  <span className="service-number">0{i + 1}</span>
-                </div>
-                <div className="lg:col-span-4 order-3 lg:order-2">
-                  <div style={{ aspectRatio: '4 / 5' }}>
-                    <img
-                      src={sImages[i]}
-                      alt={s.name}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
+                The work behind every shipment
+              </h2>
+            </div>
+            <div className="lg:col-span-5">
+              <p className="font-body text-text-secondary" style={{ fontSize: '0.9375rem', lineHeight: 1.65, maxWidth: '42ch' }}>
+                Six services that cover sourcing, inspection, and everything
+                in between concept and compliance.
+              </p>
+            </div>
+          </div>
+
+          <div
+            ref={gridRef}
+            className={`card-grid grid grid-cols-1 lg:grid-cols-12 gap-5${gridVisible ? ' is-visible' : ''}`}
+          >
+            {services.map((service, i) => (
+              <div
+                key={service.title}
+                onMouseMove={handleCardMove}
+                className={`feature-card ${service.span} ${service.variant === 'dark' ? 'feature-card--dark' : ''}`}
+                style={{ transitionDelay: `${i * 80}ms` }}
+              >
+                <span className="card-spotlight" aria-hidden="true" />
+                {service.variant === 'dark' ? (
+                  <div className="feature-card__banner">
+                    <div>
+                      <h3 className={`feature-title${service.size === 'lg' ? ' feature-title--lg' : ''}`}>
+                        {service.title}
+                      </h3>
+                      <span className="feature-accent" />
+                      <p className="feature-text">{service.text}</p>
+                    </div>
+                    <Link to="/contact" className="services-btn services-btn--light">
+                      Talk to Us
+                      <ArrowRight size={14} strokeWidth={2} />
+                    </Link>
                   </div>
-                </div>
-                <div className="lg:col-span-7 order-2 lg:order-3 lg:pl-4">
-                  <h3 className="font-display font-medium mb-4" style={{ fontSize: 'var(--text-h3)' }}>
-                    {s.name}
-                  </h3>
-                  <p className="text-text-secondary mb-5" style={{ fontSize: 'var(--text-body-lg)', lineHeight: 1.6 }}>
-                    {s.summary}
-                  </p>
-                  <p className="text-text-secondary leading-relaxed mb-6">
-                    {s.description}
-                  </p>
-                  <div className="hairline-short mb-6" />
-                  <h4 className="font-body font-semibold text-text-primary mb-2">What you gain</h4>
-                  <p className="text-text-secondary leading-relaxed">
-                    {s.value}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="inspection-stages" className="section section-alt">
-        <div className="container-wide">
-          <div className="section-heading">
-            <p className="eyebrow">Third-Party Inspection</p>
-            <h2 className="section-heading__title" style={{ maxWidth: '25ch' }}>
-              Stage-Gated Quality Oversight.
-            </h2>
-            <p className="section-heading__intro">
-              Our inspection process is carried out at different stages of textile production, from raw material through to final finished product, so issues are visible and resolved at the earliest possible point.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-8">
-            {inspectionStages.map((st, i) => (
-              <div key={st.id} className="flex flex-col h-full">
-                <span className="service-number mb-4">0{i + 1}</span>
-                <h3 className="font-body font-semibold text-text-primary mb-3" style={{ fontSize: '1.125rem' }}>
-                  {st.title}
-                </h3>
-                <p className="text-text-secondary leading-relaxed text-sm">
-                  {st.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="process" className="section">
-        <div className="container-wide">
-          <div className="section-heading">
-            <p className="eyebrow">How We Work</p>
-            <h2 className="section-heading__title" style={{ maxWidth: '22ch' }}>
-              From Brief to Delivery — in Four Clear Steps.
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-x-6 gap-y-10 lg:gap-y-0">
-            {processSteps.map((step, i) => (
-              <div key={step.id} className="relative">
-                <div className="flex flex-col gap-5">
-                  <span className="service-number">{step.number}</span>
-                  <div>
-                    <div className="hairline mb-5" />
-                    <h3 className="font-display font-medium" style={{ fontSize: '1.375rem' }}>
-                      {step.title}
+                ) : (
+                  <>
+                    <h3 className={`feature-title${service.size === 'lg' ? ' feature-title--lg' : ''}`}>
+                      {service.title}
                     </h3>
-                    <p className="mt-3 text-text-secondary leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-                </div>
-                {i < processSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-5 right-[-18px] w-9 h-px bg-border" />
+                    <span className="feature-accent" />
+                    <p className="feature-text">{service.text}</p>
+                  </>
                 )}
               </div>
             ))}
@@ -160,20 +197,173 @@ export default function Services() {
         </div>
       </section>
 
-      <section className="section section-alt">
-        <div className="container-wide">
-          <div className="max-w-3xl">
-            <p className="eyebrow mb-4">Not sure which service fits?</p>
-            <h2 className="mb-6" style={{ maxWidth: '22ch' }}>
-              Send us your brief. We'll recommend the right scope.
-            </h2>
-            <Link to="/contact" className="btn-primary no-underline">
-              Discuss your requirements
-              <ArrowRight size={16} strokeWidth={2} />
-            </Link>
-          </div>
-        </div>
-      </section>
+      <style>{`
+        .services-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-top: 24px;
+          background: #111111;
+          color: #FFFFFF;
+          font-family: "Helvetica Neue", Arial, "Segoe UI", sans-serif;
+          font-weight: 600;
+          font-size: 0.8125rem;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          text-decoration: none;
+          padding: 14px 30px;
+          border-radius: 999px;
+          transition: background-color 200ms ease, transform 200ms ease;
+          white-space: nowrap;
+        }
+        .services-btn:hover {
+          background: #000000;
+          transform: scale(1.03);
+        }
+        .services-btn--light {
+          background: #FFFFFF;
+          color: #111111;
+          margin-top: 0;
+        }
+        .services-btn--light:hover {
+          background: #F0F0EC;
+        }
+
+        @keyframes heroRise {
+          from { opacity: 0; transform: translateY(18px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .hero-word {
+          animation: heroRise 760ms cubic-bezier(.16,1,.3,1) both;
+        }
+
+        .feature-card {
+          position: relative;
+          overflow: hidden;
+          border-radius: 20px;
+          padding: 40px;
+          background: #FFFFFF;
+          border: 1px solid #ECECE6;
+          opacity: 0;
+          transform: translateY(16px);
+          transition: opacity 600ms ease, transform 600ms ease, box-shadow 350ms ease, border-color 350ms ease;
+        }
+        .card-grid.is-visible .feature-card {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .feature-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 24px 44px -28px rgba(27, 67, 50, 0.28);
+          border-color: #D8E3D4;
+        }
+        .card-grid.is-visible .feature-card:hover {
+          transform: translateY(-6px);
+        }
+
+        .card-spotlight {
+          position: absolute;
+          inset: 0;
+          background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(86, 142, 73, 0.14), transparent 70%);
+          opacity: 0;
+          transition: opacity 400ms ease;
+          pointer-events: none;
+        }
+        .feature-card:hover .card-spotlight {
+          opacity: 1;
+        }
+
+        .feature-title {
+          font-family: "Fraunces", Georgia, serif;
+          font-weight: 500;
+          color: #302B2B;
+          font-size: clamp(21px, 2.1vw, 25px);
+          letter-spacing: -0.3px;
+          margin: 0;
+          position: relative;
+          z-index: 1;
+        }
+        .feature-title--lg {
+          font-size: clamp(25px, 2.6vw, 32px);
+        }
+        .feature-accent {
+          display: block;
+          height: 2px;
+          width: 0;
+          background: #568E49;
+          margin: 16px 0 18px;
+          transition: width 420ms cubic-bezier(.16,1,.3,1);
+          position: relative;
+          z-index: 1;
+        }
+        .feature-card:hover .feature-accent {
+          width: 56px;
+        }
+        .feature-text {
+          color: #6E6E6E;
+          font-size: 0.9375rem;
+          line-height: 1.7;
+          margin: 0;
+          max-width: 46ch;
+          position: relative;
+          z-index: 1;
+        }
+
+        .feature-card--dark {
+          background: #1B4332;
+          border-color: #1B4332;
+        }
+        .feature-card--dark:hover {
+          box-shadow: 0 24px 44px -24px rgba(0, 0, 0, 0.35);
+          border-color: #1B4332;
+        }
+        .feature-card--dark .card-spotlight {
+          background: radial-gradient(460px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.10), transparent 70%);
+        }
+        .feature-card--dark .feature-title {
+          color: #F5F7F2;
+        }
+        .feature-card--dark .feature-accent {
+          background: #8FBF82;
+        }
+        .feature-card--dark .feature-text {
+          color: rgba(245, 247, 242, 0.78);
+        }
+        .feature-card__banner {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 28px;
+        }
+        @media (min-width: 1024px) {
+          .feature-card__banner {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+          }
+          .feature-card__banner > div:first-child {
+            flex: 1;
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hero-word {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+          }
+          .feature-card {
+            transition: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+          }
+          .feature-accent {
+            transition: none !important;
+          }
+        }
+      `}</style>
     </>
   )
 }
